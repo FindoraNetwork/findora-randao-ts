@@ -48,7 +48,7 @@ const _FRC20_ADDRESS: u64 = 0x1000;
 pub const BLOCK_TIME: u64 = 16;
 
 lazy_static! {
-    pub static ref RANDAO_PATH: std::sync::Mutex<String> = std::sync::Mutex::new("campaigns/".to_string());
+    pub static ref RANDAO_CAMPAIGNS: std::sync::Mutex<String> = std::sync::Mutex::new("campaigns/".to_string());
     // pub const CONF_PATH: &str = "/tmp/.randao/config/config.json";
     pub static ref KEY_PATH: std::sync::Mutex<String> = std::sync::Mutex::new("keys/".to_string());
 //     pub static ref CONF_PATH: std::sync::Mutex<String> =

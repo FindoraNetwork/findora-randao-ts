@@ -18,7 +18,7 @@ use prometheus::{
     labels, opts, register_gauge, register_histogram_vec, Encoder, Gauge, HistogramVec, TextEncoder,
 };
 use randao::config::Opts;
-use randao::RANDAO_PATH;
+use randao::RANDAO_CAMPAIGNS;
 use randao::{
     config::*, contract::*, error::Error, utils::*, BlockClient, WorkThd, ONGOING_CAMPAIGNS,
 };
@@ -147,10 +147,18 @@ fn main() -> anyhow::Result<()> {
     let mut opts: Opts = Opts::parse();
     println!("opts: {:?}", opts);
 
-    opts.datadir.push_str(&RANDAO_PATH.lock().unwrap());
-    *RANDAO_PATH.lock().unwrap() = opts.datadir;
+    let mut randao_campaigns = opts.datadir.to_owned();
+    randao_campaigns.push_str(&RANDAO_CAMPAIGNS.lock().unwrap());
+    *RANDAO_CAMPAIGNS.lock().unwrap() = randao_campaigns;
 
-    let randao_cfg = PathBuf::from(opts.config);
+    println!("campaigns: {:?}",  *RANDAO_CAMPAIGNS.lock().unwrap());
+
+    let mut randao_cfg = opts.datadir.to_owned();
+    randao_cfg.push_str(&opts.config);
+
+    println!("randao_cfg: {:?}",  randao_cfg);
+
+    let randao_cfg = PathBuf::from(randao_cfg);
     if !randao_cfg.exists() {
         create_dir(&randao_cfg)?;
     } else if !randao_cfg.is_file() {
@@ -159,8 +167,8 @@ fn main() -> anyhow::Result<()> {
 
     let randao_cfg: Config = Config::parse_from_file(&randao_cfg);
 
-    let randao_path = PathBuf::from(RANDAO_PATH.lock().unwrap().to_owned());
-    if !randao_path.exists() || !randao_path.is_dir() {
+    let randao_campaigns = PathBuf::from(RANDAO_CAMPAIGNS.lock().unwrap().to_owned());
+    if !randao_campaigns.exists() || !randao_campaigns.is_dir() {
         anyhow::bail!("randao folder is incorrect!!!");
     }
 
@@ -241,7 +249,7 @@ fn run_main(randao_cfg: &Config, is_campagin: bool) -> Result<U256, Error> {
         let _guard = MUTEX
             .lock()
             .or_else(|e| Err(Error::Unknown(format!("{:?}", e))))?;
-        read_campaign_ids(&RANDAO_PATH.lock().unwrap()).or_else(|e| {
+        read_campaign_ids(&RANDAO_CAMPAIGNS.lock().unwrap()).or_else(|e| {
             error!("Error loading campaign_id file: {:?}", e);
             Ok(Vec::new())
         })?
@@ -312,7 +320,7 @@ fn run_main(randao_cfg: &Config, is_campagin: bool) -> Result<U256, Error> {
         let is_new_campaign_id = {
             let _guard = MUTEX.lock().unwrap();
             if campaign_ids.is_empty() {
-                store_campaign_id(&RANDAO_PATH.lock().unwrap(), campaign_id).unwrap();
+                store_campaign_id(&RANDAO_CAMPAIGNS.lock().unwrap(), campaign_id).unwrap();
                 true
             } else {
                 campaign_id = campaign_ids.pop().unwrap();
@@ -328,14 +336,14 @@ fn run_main(randao_cfg: &Config, is_campagin: bool) -> Result<U256, Error> {
                     info,
                     &local_client,
                     local_client.config.clone(),
-                    RANDAO_PATH.lock().unwrap().to_owned(),
+                    RANDAO_CAMPAIGNS.lock().unwrap().to_owned(),
                 );
             } else {
                 work_thd = WorkThd::new_from_campaign_id(
                     campaign_id,
                     &local_client,
                     local_client.config.clone(),
-                    RANDAO_PATH.lock().unwrap().to_owned(),
+                    RANDAO_CAMPAIGNS.lock().unwrap().to_owned(),
                 );
             }
             println!("work thread begin!!!");
@@ -356,7 +364,7 @@ fn run_main(randao_cfg: &Config, is_campagin: bool) -> Result<U256, Error> {
 
             {
                 let _guard = MUTEX.lock().unwrap();
-                remove_campaign_id(&RANDAO_PATH.lock().unwrap(), campaign_id)
+                remove_campaign_id(&RANDAO_CAMPAIGNS.lock().unwrap(), campaign_id)
                     .or_else(|e| Err(Error::Unknown(format!("{:?}", e))))?
             }
             Ok(())
@@ -541,7 +549,7 @@ fn test_contract_new_campaign() {
         .unwrap();
     println!("my_bounty :{:?}", my_bounty);
 
-    let mut work_thd = WorkThd::new(campaign_id, info, &client, config, RANDAO_PATH.lock().unwrap().to_owned());
+    let mut work_thd = WorkThd::new(campaign_id, info, &client, config, RANDAO_CAMPAIGNS.lock().unwrap().to_owned());
     let (campaign_id, randao_num, my_bounty) = work_thd.do_task().unwrap();
 
     println!(

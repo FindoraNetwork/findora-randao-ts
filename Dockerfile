@@ -24,8 +24,8 @@ RUN rustup target add wasm32-unknown-unknown --toolchain nightly
 RUN cargo install cargo-tarpaulin
 
 FROM rust-builder as randao-builder
-RUN git clone https://github.com/FindoraNetwork/randao.git -b integration_test \
-  && mv randao /root/ \
+RUN git clone https://github.com/FindoraNetwork/randao2.git -b integration_test \
+  && mv randao2 /root/randao \
   && cd /root/randao  \
   && cargo build --release \
   && cp /root/randao/target/release/randao /bin/
