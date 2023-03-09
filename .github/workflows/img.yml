@@ -1,14 +1,11 @@
 name: Building Images
-
 on:
   push:
-    branches:
-      - integration_test
+    branches: [integration_test]
 
 jobs:
-  build-fundation-image:
+  build-image:
     name: Build Image
-    needs: call-workflow-check
     concurrency: ci-building-image
     runs-on: ubuntu-latest
     steps:
