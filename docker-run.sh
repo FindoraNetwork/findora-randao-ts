@@ -1,3 +1,3 @@
 #!/bin/bash
-nohup /bin/randao -c config/config.json -d /tmp/.randao/ > /tmp/findora-randao.log 2>&1 &
+nohup /bin/randao -c /tmp/.randao/config/config.json -p /tmp/.randao/campaigns -k /tmp/.randao/keys > /tmp/.randao/findora-randao.log 2>&1 &
 /bin/bash -c "while true;do echo hello;sleep 50000;done"

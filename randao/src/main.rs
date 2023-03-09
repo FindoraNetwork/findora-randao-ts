@@ -18,23 +18,14 @@ use prometheus::{
     labels, opts, register_gauge, register_histogram_vec, Encoder, Gauge, HistogramVec, TextEncoder,
 };
 use randao::config::Opts;
-use randao::RANDAO_CAMPAIGNS;
+use randao::{RANDAO_CAMPAIGNS, RANDAO_CONF, RANDAO_KEYS};
 use randao::{
     config::*, contract::*, error::Error, utils::*, BlockClient, WorkThd, ONGOING_CAMPAIGNS,
 };
-use std::{
-    net::SocketAddr,
-    str::FromStr,
-    fs::create_dir,
-    ops::{Add, AddAssign, SubAssign},
-    path::PathBuf,
-    sync::{
+use std::{fs::{create_dir, create_dir_all}, net::SocketAddr, ops::{Add, AddAssign, SubAssign}, path::PathBuf, str::FromStr, sync::{
         atomic::{AtomicBool, Ordering as Order},
         Arc, Mutex,
-    },
-    thread::{self, sleep},
-    time::Duration,
-};
+    }, thread::{self, sleep}, time::Duration};
 use web3::types::{H256, U256};
 
 // const CHECK_CNT: u8 = 5;
@@ -144,39 +135,36 @@ fn main() -> anyhow::Result<()> {
     // env::set_var("RUST_LOG", "info,all=info");
     // env_logger::init();
 
-    let mut opts: Opts = Opts::parse();
+    let opts: Opts = Opts::parse();
     println!("opts: {:?}", opts);
 
-    let mut randao_campaigns = opts.datadir.to_owned();
-    randao_campaigns.push_str(&RANDAO_CAMPAIGNS.lock().unwrap());
-    *RANDAO_CAMPAIGNS.lock().unwrap() = randao_campaigns;
-
+    *RANDAO_CAMPAIGNS.lock().unwrap() = opts.campaigns;
     println!("campaigns: {:?}",  *RANDAO_CAMPAIGNS.lock().unwrap());
+    *RANDAO_CONF.lock().unwrap() = opts.config;
+    println!("config: {:?}",  *RANDAO_CONF.lock().unwrap());
+    *RANDAO_KEYS.lock().unwrap() = opts.keys;
+    println!("keys: {:?}",  *RANDAO_KEYS.lock().unwrap());
 
-    let mut randao_cfg = opts.datadir.to_owned();
-    randao_cfg.push_str(&opts.config);
 
-    println!("randao_cfg: {:?}",  randao_cfg);
-
-    let randao_cfg = PathBuf::from(randao_cfg);
-    if !randao_cfg.exists() {
-        create_dir(&randao_cfg)?;
-    } else if !randao_cfg.is_file() {
-        anyhow::bail!("randao config is not file!!!");
-    }
-
-    let randao_cfg: Config = Config::parse_from_file(&randao_cfg);
-
-    let randao_campaigns = PathBuf::from(RANDAO_CAMPAIGNS.lock().unwrap().to_owned());
-    if !randao_campaigns.exists() || !randao_campaigns.is_dir() {
+    let randao_conf = PathBuf::from(RANDAO_CONF.lock().unwrap().to_owned());
+    if !randao_conf.exists() || !randao_conf.is_file() {
         anyhow::bail!("randao folder is incorrect!!!");
     }
+    let randao_campaigns = PathBuf::from(RANDAO_CAMPAIGNS.lock().unwrap().to_owned());
+    if !randao_campaigns.exists(){
+        create_dir_all(&randao_campaigns)?;
+    } else if !randao_campaigns.is_dir() {
+        anyhow::bail!("randao folder is incorrect!!!");
+    }
+    let randao_keys = PathBuf::from(RANDAO_KEYS.lock().unwrap().to_owned());
+    if !randao_keys.exists() {
+        create_dir_all(&randao_keys)?;
+    } else if !randao_keys.is_dir() {
+        anyhow::bail!("key folder is incorrect!!!");
+    }
 
-    // let key_path = Path::new(KEY_PATH);
-    // if !key_path.exists() || !key_path.is_dir() {
-    //     anyhow::bail!("key folder is incorrect!!!");
-    // }
 
+    let randao_cfg: Config = Config::parse_from_file(&randao_conf);
     let randao_cfg2 = randao_cfg.clone();
     let randao_cfg3 = randao_cfg.clone();
     if !opts.is_campagin {

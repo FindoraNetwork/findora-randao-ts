@@ -117,7 +117,6 @@ pub fn check_campaign_info(
 }
 
 pub fn store_campaign_id(randao_path: &str, campaign_id: u128) -> Result<(), std::io::Error> {
-    fs::create_dir_all(randao_path)?;
     let path = randao_path.to_string() + "campaign_ids.txt";
     let path = Path::new(&(path));
     if !path.exists() {

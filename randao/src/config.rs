@@ -89,10 +89,12 @@ impl Detokenize for CampaignInfo {
 #[derive(clap::Parser, Debug)]
 pub struct Opts {
     /// Config file
-    #[clap(short = 'c', long = "config", default_value = "config.json")]
+    #[clap(short = 'c', long = "config", default_value = "/tmp/.randao/config/config.json")]
     pub config: String,
-    #[clap(short = 'd', long = "datadir", default_value = "/tmp/.randao/")]
-    pub datadir: String,
+    #[clap(short = 'p', long = "campaigns", default_value = "/tmp/.randao/campaigns")]
+    pub campaigns: String,
+    #[clap(short = 'k', long = "keys", default_value = "/tmp/.randao/keys")]
+    pub keys: String,
     #[clap(short = 'a', long = "is_campagin")]
     pub is_campagin: bool,
 
