@@ -35,7 +35,7 @@ jobs:
         with:
           images: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_ECR_REGISTRY }}
           tags: |
-            type=raw,value=f-randao-{{branch}}-{{sha}}-{{date 'x'}}
+            type=raw,value=randao-{{branch}}-{{sha}}-{{date 'x'}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
