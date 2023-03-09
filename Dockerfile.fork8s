@@ -25,4 +25,4 @@ COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /release/randao /randao
 
 EXPOSE 9090
-ENTRYPOINT ["/randao", "-c", "/config.json", "-p", "/tmp", "-k", "/tmp"]
+ENTRYPOINT ["/randao"]
