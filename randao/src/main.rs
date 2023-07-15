@@ -48,7 +48,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
 #[post("/exit")]
 async fn exit() -> impl Responder {
     STOP.store(true, Order::SeqCst);
-    return ApiResult::<i32>::new().code(400).with_msg("exit success ");
+    return ApiResult::<i32>::new().code(400).with_msg("exit success");
 }
 
 impl MainThread {
