@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 // version 1.0
 contract Randao {
     struct Participant {
-        uint256   secret;
-        bytes32   commitment;
-        uint256   reward;
-        bool      revealed;
-        bool      rewarded;
+        uint256 secret;
+        bytes32 commitment;
+        uint256 reward;
+        bool revealed;
+        bool rewarded;
     }
 
     struct Consumer {
@@ -17,65 +17,89 @@ contract Randao {
     }
 
     struct CampaignInfo {
-        uint32    bnum;
-        uint96    deposit;
-        uint16    commitBalkline;
-        uint16    commitDeadline;
-
-        uint256   random;
-        bool      settled;
-        uint256   bountypot;
-        uint32    commitNum;
-        uint32    revealsNum;
+        uint32 bnum;
+        uint96 deposit;
+        uint16 commitBalkline;
+        uint16 commitDeadline;
+        uint256 random;
+        bool settled;
+        uint256 bountypot;
+        uint32 commitNum;
+        uint32 revealsNum;
     }
 
     struct Campaign {
-        uint32    bnum;
-        uint96    deposit;
-        uint16    commitBalkline;
-        uint16    commitDeadline;
-
-        uint256   random;
-        bool      settled;
-        uint256   bountypot;
-        uint32    commitNum;
-        uint32    revealsNum;
-
-        mapping (address => Consumer) consumers;
-        mapping (address => Participant) participants;
-        mapping (bytes32 => bool) commitments;
+        uint32 bnum;
+        uint96 deposit;
+        uint16 commitBalkline;
+        uint16 commitDeadline;
+        uint256 random;
+        bool settled;
+        uint256 bountypot;
+        uint32 commitNum;
+        uint32 revealsNum;
+        mapping(address => Consumer) consumers;
+        mapping(address => Participant) participants;
+        mapping(bytes32 => bool) commitments;
     }
 
     uint256 public numCampaigns;
-    mapping (uint256 => Campaign) public campaigns;
+    mapping(uint256 => Campaign) public campaigns;
     address public founder;
 
-    modifier blankAddress(address n) {if (n != address(0)) revert(); _;}
+    modifier blankAddress(address n) {
+        if (n != address(0)) revert();
+        _;
+    }
 
-    modifier moreThanZero(uint256 _deposit) {if (_deposit <= 0) revert(); _;}
+    modifier moreThanZero(uint256 _deposit) {
+        if (_deposit <= 0) revert();
+        _;
+    }
 
-    modifier notBlank(bytes32 _s) {if (_s == "") revert(); _;}
+    modifier notBlank(bytes32 _s) {
+        if (_s == '') revert();
+        _;
+    }
 
-    modifier beBlank(bytes32 _s) {if (_s != "") revert(); _;}
+    modifier beBlank(bytes32 _s) {
+        if (_s != '') revert();
+        _;
+    }
 
     constructor() {
         founder = msg.sender;
     }
 
-    event LogCampaignAdded(uint256 indexed campaignID,
-                            address indexed from,
-                            uint32 indexed bnum,
-                            uint96 deposit,
-                            uint16 commitBalkline,
-                            uint16 commitDeadline, 
-                            uint256 bountypot);
+    event LogCampaignAdded(
+        uint256 indexed campaignID,
+        address indexed from,
+        uint32 indexed bnum,
+        uint96 deposit,
+        uint16 commitBalkline,
+        uint16 commitDeadline,
+        uint256 bountypot
+    );
 
-    modifier timeLineCheck(uint32 _bnum, uint16 _commitBalkline, uint16 _commitDeadline) {
-        require(_commitBalkline > 0, "Invalid balkline");
-        require(_commitDeadline > 0, "Invalid deadline");
-        require(_commitDeadline < _commitBalkline, "Balkline must be earlier than deadline");
-        require(block.number < _bnum, "Block number must be later than current block");
-        require(block.number < _bnum - _commitBalkline, "Balkline must be later than current block");
+    modifier timeLineCheck(
+        uint32 _bnum,
+        uint16 _commitBalkline,
+        uint16 _commitDeadline
+    ) {
+        require(_commitBalkline > 0, 'Invalid balkline');
+        require(_commitDeadline > 0, 'Invalid deadline');
+        require(
+            _commitDeadline < _commitBalkline,
+            'Balkline must be earlier than deadline'
+        );
+        require(
+            block.number < _bnum,
+            'Block number must be later than current block'
+        );
+        require(
+            block.number < _bnum - _commitBalkline,
+            'Balkline must be later than current block'
+        );
         _;
     }
 
@@ -84,9 +108,13 @@ contract Randao {
         uint96 _deposit,
         uint16 _commitBalkline,
         uint16 _commitDeadline
-    ) payable
+    )
+        external
+        payable
         timeLineCheck(_bnum, _commitBalkline, _commitDeadline)
-        moreThanZero(_deposit) external returns (uint256 _campaignID) {
+        moreThanZero(_deposit)
+        returns (uint256 _campaignID)
+    {
         _campaignID = numCampaigns++;
         Campaign storage c = campaigns[_campaignID];
         c.bnum = _bnum;
@@ -95,36 +123,52 @@ contract Randao {
         c.commitDeadline = _commitDeadline;
         c.bountypot = msg.value;
         c.consumers[msg.sender] = Consumer(msg.sender, msg.value);
-        emit LogCampaignAdded(_campaignID, msg.sender, _bnum, _deposit, _commitBalkline, _commitDeadline, msg.value);
+        emit LogCampaignAdded(
+            _campaignID,
+            msg.sender,
+            _bnum,
+            _deposit,
+            _commitBalkline,
+            _commitDeadline,
+            msg.value
+        );
     }
 
-    function getCampaign(uint256 _campaignID) external view returns (CampaignInfo memory) {
+    function getCampaign(
+        uint256 _campaignID
+    ) external view returns (CampaignInfo memory) {
         Campaign storage c = campaigns[_campaignID];
-        return CampaignInfo({
-            bnum : c.bnum,
-            deposit : c.deposit,
-            commitBalkline : c.commitBalkline,
-            commitDeadline : c.commitDeadline,
-
-            random : c.random,
-            settled : c.settled,
-            bountypot : c.bountypot,
-            commitNum : c.commitNum,
-            revealsNum : c.revealsNum
-        });
+        return
+            CampaignInfo({
+                bnum: c.bnum,
+                deposit: c.deposit,
+                commitBalkline: c.commitBalkline,
+                commitDeadline: c.commitDeadline,
+                random: c.random,
+                settled: c.settled,
+                bountypot: c.bountypot,
+                commitNum: c.commitNum,
+                revealsNum: c.revealsNum
+            });
     }
 
-    event LogFollow(uint256 indexed CampaignId, address indexed from, uint256 bountypot);
+    event LogFollow(
+        uint256 indexed CampaignId,
+        address indexed from,
+        uint256 bountypot
+    );
 
-    function follow(uint256 _campaignID)
-        external payable returns (bool) {
+    function follow(uint256 _campaignID) external payable returns (bool) {
         Campaign storage c = campaigns[_campaignID];
         Consumer storage consumer = c.consumers[msg.sender];
         return followCampaign(_campaignID, c, consumer);
     }
 
     modifier checkFollowPhase(uint256 _bnum, uint16 _commitDeadline) {
-        require(block.number <= _bnum - _commitDeadline, "Too late to follow campaign");
+        require(
+            block.number <= _bnum - _commitDeadline,
+            'Too late to follow campaign'
+        );
         _;
     }
 
@@ -132,29 +176,50 @@ contract Randao {
         uint256 _campaignID,
         Campaign storage c,
         Consumer storage consumer
-    ) checkFollowPhase(c.bnum, c.commitDeadline)
-        blankAddress(consumer.caddr) internal returns (bool) {
+    )
+        internal
+        checkFollowPhase(c.bnum, c.commitDeadline)
+        blankAddress(consumer.caddr)
+        returns (bool)
+    {
         c.bountypot += msg.value;
         c.consumers[msg.sender] = Consumer(msg.sender, msg.value);
         emit LogFollow(_campaignID, msg.sender, msg.value);
         return true;
     }
 
-    event LogCommit(uint256 indexed CampaignId, address indexed from, bytes32 commitment);
+    event LogCommit(
+        uint256 indexed CampaignId,
+        address indexed from,
+        bytes32 commitment
+    );
 
-    function commit(uint256 _campaignID, bytes32 _hs) notBlank(_hs) external payable {
+    function commit(
+        uint256 _campaignID,
+        bytes32 _hs
+    ) external payable notBlank(_hs) {
         Campaign storage c = campaigns[_campaignID];
         commitmentCampaign(_campaignID, _hs, c);
     }
 
     modifier checkDeposit(uint256 _deposit) {
-        require(msg.value == _deposit, "Incorrect deposit supplied");
+        require(msg.value == _deposit, 'Incorrect deposit supplied');
         _;
     }
 
-    modifier checkCommitPhase(uint256 _bnum, uint16 _commitBalkline, uint16 _commitDeadline) {
-        require(block.number >= _bnum - _commitBalkline, "Too early to commit to compaign");
-        require(block.number <= _bnum - _commitDeadline, "Too late to commit to compaign");
+    modifier checkCommitPhase(
+        uint256 _bnum,
+        uint16 _commitBalkline,
+        uint16 _commitDeadline
+    ) {
+        require(
+            block.number >= _bnum - _commitBalkline,
+            'Too early to commit to compaign'
+        );
+        require(
+            block.number <= _bnum - _commitDeadline,
+            'Too late to commit to compaign'
+        );
         _;
     }
 
@@ -162,11 +227,14 @@ contract Randao {
         uint256 _campaignID,
         bytes32 _hs,
         Campaign storage c
-    ) checkDeposit(c.deposit)
+    )
+        internal
+        checkDeposit(c.deposit)
         checkCommitPhase(c.bnum, c.commitBalkline, c.commitDeadline)
-        beBlank(c.participants[msg.sender].commitment) internal {
+        beBlank(c.participants[msg.sender].commitment)
+    {
         if (c.commitments[_hs]) {
-            revert("Already committed to compaign");
+            revert('Already committed to compaign');
         } else {
             c.participants[msg.sender] = Participant(0, _hs, 0, false, false);
             c.commitNum++;
@@ -176,7 +244,9 @@ contract Randao {
     }
 
     // For test
-    function getCommitment(uint256 _campaignID) external view returns (bytes32) {
+    function getCommitment(
+        uint256 _campaignID
+    ) external view returns (bytes32) {
         Campaign storage c = campaigns[_campaignID];
         Participant storage p = c.participants[msg.sender];
         return p.commitment;
@@ -186,7 +256,11 @@ contract Randao {
         return keccak256(abi.encodePacked(_s));
     }
 
-    event LogReveal(uint256 indexed CampaignId, address indexed from, uint256 secret);
+    event LogReveal(
+        uint256 indexed CampaignId,
+        address indexed from,
+        uint256 secret
+    );
 
     function reveal(uint256 _campaignID, uint256 _s) external {
         Campaign storage c = campaigns[_campaignID];
@@ -195,13 +269,19 @@ contract Randao {
     }
 
     modifier checkRevealPhase(uint256 _bnum, uint16 _commitDeadline) {
-        require(block.number > _bnum - _commitDeadline, "Too early to reveal secret");
-        require(block.number < _bnum, "Too late to reveal secret");
+        require(
+            block.number > _bnum - _commitDeadline,
+            'Too early to reveal secret'
+        );
+        require(block.number < _bnum, 'Too late to reveal secret');
         _;
     }
 
     modifier checkSecret(uint256 _s, bytes32 _commitment) {
-        require(keccak256(abi.encodePacked(_s)) == _commitment, "Secret doesn't match commitment");
+        require(
+            keccak256(abi.encodePacked(_s)) == _commitment,
+            "Secret doesn't match commitment"
+        );
         _;
     }
 
@@ -210,9 +290,12 @@ contract Randao {
         uint256 _s,
         Campaign storage c,
         Participant storage p
-    ) checkRevealPhase(c.bnum, c.commitDeadline)
-        checkSecret(_s, p.commitment) internal {
-        require(!p.revealed, "Already revealed secret");
+    )
+        internal
+        checkRevealPhase(c.bnum, c.commitDeadline)
+        checkSecret(_s, p.commitment)
+    {
+        require(!p.revealed, 'Already revealed secret');
         p.secret = _s;
         p.revealed = true;
         c.revealsNum++;
@@ -221,12 +304,15 @@ contract Randao {
     }
 
     modifier bountyPhase(uint256 _bnum) {
-        require(block.number >= _bnum, "Compaign is not in the bounty phase");
+        require(block.number >= _bnum, 'Compaign is not in the bounty phase');
         _;
     }
 
     modifier campaignSettled(uint32 _commitNum, uint32 _revealsNum) {
-        require(_commitNum == _revealsNum && _commitNum > 0, "Compaign is not settled");
+        require(
+            _commitNum == _revealsNum && _commitNum > 0,
+            'Compaign is not settled'
+        );
         _;
     }
 
@@ -235,9 +321,14 @@ contract Randao {
         return returnRandom(c);
     }
 
-    function returnRandom(Campaign storage c) internal
+    function returnRandom(
+        Campaign storage c
+    )
+        internal
         bountyPhase(c.bnum)
-        campaignSettled(c.commitNum, c.revealsNum) returns (uint256) {
+        campaignSettled(c.commitNum, c.revealsNum)
+        returns (uint256)
+    {
         c.settled = true;
         return c.random;
     }
@@ -256,26 +347,28 @@ contract Randao {
     function transferBounty(
         Campaign storage c,
         Participant storage p
-        ) bountyPhase(c.bnum) internal returns (uint256) {
-        require(!p.rewarded, "Bouty already claimed");
+    ) internal bountyPhase(c.bnum) returns (uint256) {
+        require(!p.rewarded, 'Bouty already claimed');
         uint256 share = 0;
         if (c.revealsNum > 0) {
             if (p.revealed) {
                 share = calculateShare(c);
                 returnReward(share, c, p);
             }
-        // Nobody reveals
+            // Nobody reveals
         } else if (c.commitNum > 0) {
             returnReward(0, c, p);
         }
         return share;
     }
 
-    function calculateShare(Campaign storage c) internal view returns (uint256 _share) {
+    function calculateShare(
+        Campaign storage c
+    ) internal view returns (uint256 _share) {
         // Someone does not reveal. Campaign fails.
         if (c.commitNum > c.revealsNum) {
             _share = fines(c) / c.revealsNum;
-        // Campaign succeeds.
+            // Campaign succeeds.
         } else {
             _share = c.bountypot / c.revealsNum;
         }
@@ -302,20 +395,26 @@ contract Randao {
     }
 
     modifier campaignFailed(uint32 _commitNum, uint32 _revealsNum) {
-        require(_commitNum > _revealsNum, "Bounty is not refundable on successful compaign");
+        require(
+            _commitNum > _revealsNum,
+            'Bounty is not refundable on successful compaign'
+        );
         _;
     }
 
     modifier beConsumer(address _caddr) {
-        require(_caddr == msg.sender, "Not a random number consumer");
+        require(_caddr == msg.sender, 'Not a random number consumer');
         _;
     }
 
-    function returnBounty(Campaign storage c)
+    function returnBounty(
+        Campaign storage c
+    )
         internal
         bountyPhase(c.bnum)
         campaignFailed(c.commitNum, c.revealsNum)
-        beConsumer(c.consumers[msg.sender].caddr) {
+        beConsumer(c.consumers[msg.sender].caddr)
+    {
         uint256 bountypot = c.consumers[msg.sender].bountypot;
         c.consumers[msg.sender].bountypot = 0;
         payable(msg.sender).transfer(bountypot);

@@ -10,11 +10,27 @@ geth-test/out.log.geth
 geth-test/data/
 !geth-test/data/keystore/*.*
 
-out.log.geth
 
-node_modules/
-.idea/
-.secret
-package-lock.json
-target/
-Cargo.lock
+
+
+
+eth/node_modules
+eth/typechain
+eth/typechain-types
+
+# Hardhat files
+eth/cache
+eth/artifacts
+
+eth/node_modules
+eth/coverage
+eth/coverage.json
+eth/abi
+
+# Hardhat files
+eth/build
+
+# Project files
+yarn-error.log
+
+randao/bin/
