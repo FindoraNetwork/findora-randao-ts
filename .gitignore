@@ -1,36 +1,4 @@
-environments
-
-!environments/**/config.json
-
-build/
-
-data/
-
-geth-test/out.log.geth
-geth-test/data/
-!geth-test/data/keystore/*.*
-
-
-
-
-
-eth/node_modules
-eth/typechain
-eth/typechain-types
-
-# Hardhat files
-eth/cache
-eth/artifacts
-
-eth/node_modules
-eth/coverage
-eth/coverage.json
-eth/abi
-
-# Hardhat files
-eth/build
-
-# Project files
-yarn-error.log
-
-randao/bin/
+node_modules
+campaigns
+campaigns*
+config*.json

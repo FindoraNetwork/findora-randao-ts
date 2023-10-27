@@ -1,0 +1,52 @@
+{
+  "name": "eth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "yarn hardhat compile",
+    "typechain": "yarn hardhat typechain",
+    "build": "run-s compile typechain",
+    "chain": "yarn hardhat node",
+    "clean": "rm -rf build artifacts typechain-types cache abi",
+    "fmt": "prettier src/*.ts src/**/*.ts --write",
+    "lint": "eslint 'src/**/*.ts'",
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "participant": "node -r ts-node/register -r tsconfig-paths/register -r dotenv/config src/participant.ts",
+    "campaign": "node -r ts-node/register -r tsconfig-paths/register -r dotenv/config src/campaign.ts",
+    "test1": "yarn participant -c config1.json",
+    "test2": "yarn participant -c config2.json",
+    "test3": "yarn participant -c config3.json",
+    "test4": "yarn participant -c config4.json",
+    "test5": "yarn campaign -c config5.json",
+    "test6": "yarn campaign -c config6.json",
+    "test7": "yarn campaign -c config7.json",
+    "test8": "yarn campaign -c config8.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "@types/node": ">=16.0.0",
+    "@types/yargs": "^17.0.24",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.47.0",
+    "hardhat": "^2.17.1",
+    "tsconfig-paths": "^4.2.0"
+  },
+  "dependencies": {
+    "@types/debug": "^4.1.10",
+    "bigint-conversion": "^2.4.2",
+    "debug": "^4.3.4",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0",
+    "sleep-promise": "^9.1.0",
+    "ts-node": ">=8.0.0",
+    "typescript": ">=4.5.0",
+    "util": "^0.12.5",
+    "yargs": "^17.7.2",
+    "zod": "^3.22.2"
+  }
+}
