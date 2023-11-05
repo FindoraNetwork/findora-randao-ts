@@ -55,15 +55,12 @@ async function subtask(
         value: deposit,
         nonce: available_nonce1,
       });
+      available_nonce1 += 1;
     } else {
       tx = await randao.commit(campaignID, hs, {
         value: deposit,
         nonce: pending_nonce,
       });
-    }
-    if (pending_nonce < available_nonce1) {
-      available_nonce1 += 1;
-    } else {
       available_nonce1 = pending_nonce + 1;
     }
   } catch (err) {
@@ -90,15 +87,11 @@ async function subtask(
   try {
     await lock(mutex1);
     pending_nonce = await provider.getTransactionCount(account, 'pending');
-    // An exception may be thrown, and it must be divided into two conditions judgment.
     if (pending_nonce < available_nonce1) {
       tx = await randao.reveal(campaignID, s, { nonce: available_nonce1 });
-    } else {
-      tx = await randao.reveal(campaignID, s, { nonce: pending_nonce });
-    }
-    if (pending_nonce < available_nonce1) {
       available_nonce1 += 1;
     } else {
+      tx = await randao.reveal(campaignID, s, { nonce: pending_nonce });
       available_nonce1 = pending_nonce + 1;
     }
   } catch (err) {
@@ -124,12 +117,9 @@ async function subtask(
     pending_nonce = await provider.getTransactionCount(account, 'pending');
     if (pending_nonce < available_nonce1) {
       tx = await randao.getMyBounty(campaignID, { nonce: available_nonce1 });
-    } else {
-      tx = await randao.getMyBounty(campaignID, { nonce: pending_nonce });
-    }
-    if (pending_nonce < available_nonce1) {
       available_nonce1 += 1;
     } else {
+      tx = await randao.getMyBounty(campaignID, { nonce: pending_nonce });
       available_nonce1 = pending_nonce + 1;
     }
   } catch (err) {
