@@ -1,4 +1,4 @@
 node_modules
 campaigns
 campaigns*
-config*.json
+# config*.json

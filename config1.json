@@ -1,0 +1,23 @@
+{
+    "chain": {
+        "name": "hyprtest",
+        "chain_id": "60005",
+        "endpoint": "http://testnet-proposer0.hypr.network:8545",
+        "event_endpoint": "http://testnet-proposer0.hypr.network:8545",
+        "participant": "8ea5974517769211efd4af5814ea1600ba888b7786f7df5e26dc3d6bab6822bc",
+        "campaigner": "8ea5974517769211efd4af5814ea1600ba888b7786f7df5e26dc3d6bab6822bc",
+        "randao": "0xA886B863E8b4be9f6D7090DcB30fE57d5dA920AB",
+        "opts": {
+            "gas_limit": "1000000",
+            "max_gas_price": "100000000000",
+            "min_gas_reserve": "1000000000000000000",
+            "max_deposit": 10,
+            "min_rate_of_return": 50,
+            "min_reveal_window": 7,
+            "max_reveal_delay": 6,
+            "max_campaigns": 10,
+            "start_block": 0
+        }
+    },
+    "http_listen": "127.0.0.1:3000"
+}
