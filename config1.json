@@ -6,7 +6,7 @@
         "event_endpoint": "http://testnet-proposer0.hypr.network:8545",
         "participant": "8ea5974517769211efd4af5814ea1600ba888b7786f7df5e26dc3d6bab6822bc",
         "campaigner": "8ea5974517769211efd4af5814ea1600ba888b7786f7df5e26dc3d6bab6822bc",
-        "randao": "0xA886B863E8b4be9f6D7090DcB30fE57d5dA920AB",
+        "randao": "0xfB45f8B9705FFA9d05D42b72E73afE7E2ceEa860",
         "opts": {
             "gas_limit": "1000000",
             "max_gas_price": "100000000000",
